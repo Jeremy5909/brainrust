@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fs::File, io::{BufRead, BufReader}};
 struct BrainFun {
     current_pos: i16,
     short_mode: bool
@@ -242,9 +242,91 @@ impl BrainFun {
         }
         input
     }
+
+    fn process_command(&mut self, command: &str) -> String {
+        let mut output = String::new();
+        let mut parts = command.split_whitespace();
+        if let Some(action) = parts.next() {
+            match action {
+                "ADD" => {
+                    let num = parts.next().unwrap().parse::<i16>().unwrap();
+                    output.push_str(&self.add(num));
+                },
+                "MULT" => {
+                    let num1 = parts.next().unwrap().parse::<i16>().unwrap();
+                    if let Some(num2) = parts.next() {
+                        output.push_str(&self.multiply_positions(num1, num2.parse::<i16>().unwrap()));
+                    } else {
+                        output.push_str(&self.multiply_current(num1));
+                    }
+                },
+                "GOTO" => {
+                    let num_str = parts.next().unwrap();
+                    if let Ok(num) = num_str.parse::<i16>() {
+                        output.push_str(&self.set_pos(num));
+                    } else {
+                        if num_str == "RIGHT" {
+                            output.push_str(&self.set_pos(self.current_pos + 1));
+                        } else if num_str == "LEFT" {
+                            output.push_str(&self.set_pos(self.current_pos - 1));
+                        }
+                    }
+                },
+                "SET" => {
+                    let num = parts.next().unwrap().parse::<i16>().unwrap();
+                    output.push_str(&self.set_pos(num));
+                },
+                "MOVE" => {
+                    let num_str = parts.next().unwrap();
+                    if let Ok(num) = num_str.parse::<i16>() {
+                        output.push_str(&self.set_pos(num));
+                    } else {
+                        if num_str == "RIGHT" {
+                            output.push_str(&self.move_to(self.current_pos + 1));
+                        } else if num_str == "LEFT" {
+                            output.push_str(&self.move_to(self.current_pos - 1));
+                        }
+                    }
+                },
+                "CLONE" => {
+                    let num_str = parts.next().unwrap();
+                    if let Ok(num) = num_str.parse::<i16>() {
+                        output.push_str(&self.set_pos(num));
+                    } else {
+                        if num_str == "RIGHT" {
+                            output.push_str(&self.duplicate_to(self.current_pos + 1));
+                        } else if num_str == "LEFT" {
+                            output.push_str(&self.duplicate_to(self.current_pos - 1));
+                        }
+                    }
+                },
+                "TEXT" => {
+                    let text = parts.collect::<Vec<&str>>().join(" ");
+                    output = self.text(&text);
+                }
+                _ => {}
+            }
+        }
+        Self::cleanup_bf(&output)
+    }
+
+    fn execute_from_file(&mut self, file_path: &str) -> String {
+        let mut output = String::new();
+        if let Ok(file) = File::open(file_path) {
+            let reader = BufReader::new(file);
+            for line in reader.lines() {
+                if let Ok(line) = line {
+                    output.push_str(&self.process_command(&line));
+                }
+            }
+        } else {
+            eprintln!("Failed to open file: {}", file_path)
+        }
+        output
+    }
 }
 
 fn main() {
     let mut bf = BrainFun::new(true);
-    println!("{}", &BrainFun::cleanup_bf(&bf.text("Hello World!")));
+    println!("{}", bf.execute_from_file("./code.rf"));
 }
