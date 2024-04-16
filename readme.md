@@ -1,0 +1,1 @@
+an implementation of my brainfun in rust. proper documention maybe coming
