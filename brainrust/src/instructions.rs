@@ -6,6 +6,7 @@ pub enum Instruction {
     SetVar(String, i32),
     UnsetVar(String),
     AddVars(String, String),
+    AddString(String, String),
 }
 
 impl Program {
@@ -24,12 +25,22 @@ impl Program {
                         self.goto(index);
                         self.set_zero();
                     } else {
-                        index = self.get_unused_index();
+                        index = self.allocate();
                         self.goto(index);
                     }
                     self.debug_msg(&format!("Setting {name} at {index} to {value}"));
                     self.add(value);
                     self.vars.insert(name, index);
+                }
+                Instruction::AddString(name, val) => {
+                    let start = self.allocate_arr(val.len());
+
+                    for (i, c) in val.chars().enumerate() {
+                        self.goto(start + i);
+                        self.add(c as i32);
+                    }
+
+                    self.vars.insert(name, start);
                 }
                 Instruction::UnsetVar(name) => {
                     let index = *self.vars.get(&name).unwrap();
@@ -38,7 +49,7 @@ impl Program {
                     self.goto(index);
                     self.set_zero();
                     self.vars.remove(&name);
-                    self.unuse_index();
+                    self.deallocate();
                 }
                 Instruction::AddVars(var1, var2) => {
                     let index1 = *self.vars.get(&var1).unwrap();
