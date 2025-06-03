@@ -7,7 +7,7 @@ mod instructions;
 // Methods that actually add to the out
 mod actions;
 // Other useful stuff
-mod util;
+mod utils;
 
 enum Optimization {
     Speed,

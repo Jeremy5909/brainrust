@@ -5,7 +5,7 @@ use crate::Program;
 pub enum Instruction {
     SetVar(String, i32),
     UnsetVar(String),
-    AddVars(String, String),
+    Sum(String, String),
     AddString(String, String),
 }
 
@@ -51,10 +51,10 @@ impl Program {
                     self.vars.remove(&name);
                     self.deallocate();
                 }
-                Instruction::AddVars(var1, var2) => {
+                Instruction::Sum(var1, var2) => {
                     let index1 = *self.vars.get(&var1).unwrap();
                     let index2 = *self.vars.get(&var2).unwrap();
-                    // all out.push-ing should be in actions - need loops
+                    // TODO the list making should be handled in actions.rs
                     self.goto(index2);
                     self.out.push_str("[");
                     self.goto(index1);
