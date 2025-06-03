@@ -4,6 +4,13 @@ use crate::Program;
 
 impl Program {
     pub(crate) fn add(&mut self, n: i32) {
+        if self.optimised {
+            self.add_optimised(n);
+        } else {
+            self.add_unomptimised(n);
+        }
+    }
+    fn add_unomptimised(&mut self, n: i32) {
         let c = match n.signum() {
             1 => '+',
             -1 => '-',
@@ -12,7 +19,17 @@ impl Program {
         let out: String = iter::repeat_n(c, n.abs() as usize).collect();
         self.out.push_str(&out);
     }
+    fn add_optimised(&mut self, n: i32) {
+        todo!()
+    }
     pub(crate) fn goto(&mut self, i: usize) {
+        if self.optimised {
+            self.goto_omtimised(i);
+        } else {
+            self.goto_unomtimised(i);
+        }
+    }
+    fn goto_unomtimised(&mut self, i: usize) {
         let c = match self.index.cmp(&i) {
             Ordering::Less => '>',
             Ordering::Greater => '<',
@@ -22,5 +39,8 @@ impl Program {
             iter::repeat_n(c, (self.index as i32 - i as i32).abs() as usize).collect();
         self.index = i;
         self.out.push_str(&out);
+    }
+    fn goto_omtimised(&mut self, i: usize) {
+        todo!()
     }
 }

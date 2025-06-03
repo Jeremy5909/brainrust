@@ -25,6 +25,7 @@ pub struct Program {
     debug: bool,
     used_indexes: Vec<usize>,
     out: String,
+    optimised: bool,
 }
 
 impl Program {
@@ -36,6 +37,7 @@ impl Program {
             debug: false,
             used_indexes: Vec::new(),
             out: String::new(),
+            optimised: false,
         }
     }
     pub fn debug(mut self) -> Self {
@@ -44,6 +46,10 @@ impl Program {
     }
     pub fn add_instruction(mut self, instruction: Instruction) -> Self {
         self.instructions.push(instruction);
+        self
+    }
+    pub fn optimised(mut self) -> Self {
+        self.optimised = true;
         self
     }
     pub fn build(mut self) -> String {
