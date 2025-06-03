@@ -1,4 +1,9 @@
-use std::{cmp::Ordering, collections::HashMap, iter, mem};
+use std::{collections::HashMap, mem};
+
+// Methods that actually add to the out
+mod actions;
+// Other useful stuff
+mod util;
 
 #[derive(Debug)]
 pub struct Variable {
@@ -38,30 +43,6 @@ impl Program {
         self.instructions.push(instruction);
         self
     }
-    fn debug_msg(&self, msg: &str) {
-        if self.debug {
-            eprintln!("{msg}");
-        }
-    }
-    fn unuse_index(&mut self) {
-        let i = self
-            .used_indexes
-            .iter()
-            .position(|&x| x == self.index)
-            .unwrap();
-        self.used_indexes.remove(i);
-    }
-    fn get_unused_index(&mut self) -> usize {
-        let mut i = 0;
-        loop {
-            if !self.used_indexes.contains(&(i)) {
-                self.used_indexes.push(i);
-                return i;
-            } else {
-                i += 1;
-            }
-        }
-    }
     pub fn build(mut self) -> String {
         for instruction in mem::take(&mut self.instructions) {
             self.debug_msg("\n");
@@ -99,25 +80,5 @@ impl Program {
             }
         }
         self.out
-    }
-    fn add(&mut self, n: i32) {
-        let c = match n.signum() {
-            1 => '+',
-            -1 => '-',
-            _ => return,
-        };
-        let out: String = iter::repeat_n(c, n.abs() as usize).collect();
-        self.out.push_str(&out);
-    }
-    fn goto(&mut self, i: usize) {
-        let c = match self.index.cmp(&i) {
-            Ordering::Less => '>',
-            Ordering::Greater => '<',
-            Ordering::Equal => return,
-        };
-        let out: String =
-            iter::repeat_n(c, (self.index as i32 - i as i32).abs() as usize).collect();
-        self.index = i;
-        self.out.push_str(&out);
     }
 }
