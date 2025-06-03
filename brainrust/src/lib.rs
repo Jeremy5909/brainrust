@@ -5,6 +5,9 @@ mod actions;
 // Other useful stuff
 mod util;
 
+#[cfg(test)]
+mod tests;
+
 #[derive(Debug)]
 pub struct Variable {
     index: usize,
