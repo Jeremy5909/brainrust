@@ -10,6 +10,16 @@ impl Program {
             self.add_unomptimised(n);
         }
     }
+    pub(crate) fn goto(&mut self, i: usize) {
+        if self.optimised {
+            self.goto_omtimised(i);
+        } else {
+            self.goto_unomtimised(i);
+        }
+    }
+    pub(crate) fn set_zero(&mut self) {
+        self.out.push_str("[-]");
+    }
     fn add_unomptimised(&mut self, n: i32) {
         let c = match n.signum() {
             1 => '+',
@@ -21,13 +31,6 @@ impl Program {
     }
     fn add_optimised(&mut self, n: i32) {
         todo!()
-    }
-    pub(crate) fn goto(&mut self, i: usize) {
-        if self.optimised {
-            self.goto_omtimised(i);
-        } else {
-            self.goto_unomtimised(i);
-        }
     }
     fn goto_unomtimised(&mut self, i: usize) {
         let c = match self.index.cmp(&i) {
