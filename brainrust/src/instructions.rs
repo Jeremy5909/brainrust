@@ -20,13 +20,13 @@ impl Program {
                     let index;
                     if let Some(var) = self.vars.get(&name) {
                         index = *var;
+                        self.goto(index);
+                        self.set_zero();
                     } else {
                         index = self.get_unused_index();
+                        self.goto(index);
                     }
                     self.debug_msg(&format!("Setting {name} at {index} to {value}"));
-
-                    self.goto(index);
-                    self.set_zero();
                     self.add(value);
                     self.vars.insert(name, index);
                 }
