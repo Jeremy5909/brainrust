@@ -1,6 +1,6 @@
 use std::mem;
 
-use crate::Program;
+use crate::{Error, Program};
 
 pub enum Instruction {
     SetVar(String, i32),
@@ -10,7 +10,7 @@ pub enum Instruction {
 }
 
 impl Program {
-    pub fn build(mut self) -> String {
+    pub fn build(mut self) -> Result<String, Error> {
         for instruction in mem::take(&mut self.instructions) {
             self.debug_msg("\n");
             self.debug_msg(&format!("Variables: {:#?}", self.vars));
@@ -43,7 +43,10 @@ impl Program {
                     self.vars.insert(name, start);
                 }
                 Instruction::UnsetVar(name) => {
-                    let index = *self.vars.get(&name).unwrap();
+                    let index = *self
+                        .vars
+                        .get(&name)
+                        .ok_or(Error::VariableNotFound(name.clone()))?;
                     self.debug_msg(&format!("Unsetting {name} at {index}"));
 
                     self.goto(index);
@@ -52,8 +55,8 @@ impl Program {
                     self.deallocate();
                 }
                 Instruction::Sum(var1, var2) => {
-                    let index1 = *self.vars.get(&var1).unwrap();
-                    let index2 = *self.vars.get(&var2).unwrap();
+                    let index1 = *self.vars.get(&var1).ok_or(Error::VariableNotFound(var1))?;
+                    let index2 = *self.vars.get(&var2).ok_or(Error::VariableNotFound(var2))?;
                     // TODO the list making should be handled in actions.rs
                     self.goto(index2);
                     self.out.push_str("[");
@@ -65,6 +68,6 @@ impl Program {
                 }
             }
         }
-        self.out
+        Ok(self.out)
     }
 }

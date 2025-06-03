@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::Debug};
 
 pub use instructions::Instruction;
 
@@ -9,6 +9,17 @@ mod actions;
 // Other useful stuff
 mod utils;
 
+#[derive()]
+pub enum Error {
+    VariableNotFound(String),
+}
+impl Debug for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::VariableNotFound(name) => write!(f, "variable '{name}' not found"),
+        }
+    }
+}
 enum Optimization {
     Speed,
     Size,
