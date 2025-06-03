@@ -1,20 +1,20 @@
 use std::{cmp::Ordering, iter};
 
-use crate::Program;
+use crate::{Optimization, Program};
 
 impl Program {
     pub(crate) fn add(&mut self, n: i32) {
-        if self.optimised {
-            self.add_optimised(n);
-        } else {
-            self.add_unomptimised(n);
+        match self.optimization {
+            Optimization::None => self.add_unomptimised(n),
+            Optimization::Speed => self.add_fast(n),
+            Optimization::Size => self.add_small(n),
         }
     }
     pub(crate) fn goto(&mut self, i: usize) {
-        if self.optimised {
-            self.goto_omtimised(i);
-        } else {
-            self.goto_unomtimised(i);
+        match self.optimization {
+            Optimization::None => self.goto_unomtimised(i),
+            Optimization::Speed => self.goto_fast(i),
+            Optimization::Size => self.goto_small(i),
         }
     }
     pub(crate) fn set_zero(&mut self) {
@@ -29,7 +29,10 @@ impl Program {
         let out: String = iter::repeat_n(c, n.abs() as usize).collect();
         self.out.push_str(&out);
     }
-    fn add_optimised(&mut self, n: i32) {
+    fn add_fast(&mut self, n: i32) {
+        todo!()
+    }
+    fn add_small(&mut self, n: i32) {
         todo!()
     }
     fn goto_unomtimised(&mut self, i: usize) {
@@ -43,7 +46,10 @@ impl Program {
         self.index = i;
         self.out.push_str(&out);
     }
-    fn goto_omtimised(&mut self, i: usize) {
+    fn goto_fast(&mut self, i: usize) {
+        todo!()
+    }
+    fn goto_small(&mut self, i: usize) {
         todo!()
     }
 }

@@ -9,6 +9,11 @@ mod actions;
 // Other useful stuff
 mod util;
 
+enum Optimization {
+    Speed,
+    Size,
+    None,
+}
 pub struct Program {
     instructions: Vec<Instruction>,
     vars: HashMap<String, usize>,
@@ -16,7 +21,7 @@ pub struct Program {
     debug: bool,
     used_indexes: Vec<usize>,
     out: String,
-    optimised: bool,
+    optimization: Optimization,
 }
 
 impl Program {
@@ -28,7 +33,7 @@ impl Program {
             debug: false,
             used_indexes: Vec::new(),
             out: String::new(),
-            optimised: false,
+            optimization: Optimization::None,
         }
     }
     pub fn debug(mut self) -> Self {
@@ -39,8 +44,12 @@ impl Program {
         self.instructions.push(instruction);
         self
     }
-    pub fn optimised(mut self) -> Self {
-        self.optimised = true;
+    pub fn optimize_speed(mut self) -> Self {
+        self.optimization = Optimization::Speed;
+        self
+    }
+    pub fn size(mut self) -> Self {
+        self.optimization = Optimization::Size;
         self
     }
 }
