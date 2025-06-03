@@ -1,7 +1,5 @@
 use brainrust::{Instruction, Program};
 
-mod brainrust;
-
 fn main() {
     let prog = Program::new()
         .add_instruction(Instruction::SetVar("x".to_owned(), 3))
