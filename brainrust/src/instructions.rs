@@ -5,6 +5,7 @@ use crate::Program;
 pub enum Instruction {
     SetVar(String, i32),
     UnsetVar(String),
+    AddVars(String, String),
 }
 
 impl Program {
@@ -38,6 +39,18 @@ impl Program {
                     self.set_zero();
                     self.vars.remove(&name);
                     self.unuse_index();
+                }
+                Instruction::AddVars(var1, var2) => {
+                    let index1 = *self.vars.get(&var1).unwrap();
+                    let index2 = *self.vars.get(&var2).unwrap();
+                    // all out.push-ing should be in actions - need loops
+                    self.goto(index2);
+                    self.out.push_str("[");
+                    self.goto(index1);
+                    self.out.push_str("+");
+                    self.goto(index2);
+                    self.out.push_str("-");
+                    self.out.push_str("]");
                 }
             }
         }
