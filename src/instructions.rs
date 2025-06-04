@@ -8,6 +8,7 @@ pub enum Instruction {
     Sum(String, String),
     SetString(String, String),
     PrintString(String),
+    Copy(String, String),
 }
 
 impl Program {
@@ -64,6 +65,28 @@ impl Program {
                     self.goto(index2);
                     self.out.push('-');
                     self.out.push(']');
+                }
+                Instruction::Copy(from, to) => {
+                    let original = self.get_var(&from)?;
+                    let temp1 = self.allocate();
+                    let temp2 = self.allocate();
+                    // Reset to if somethings already there
+                    if let Ok(index2) = self.get_var(&to) {
+                        self.goto(index2);
+                        self.set_zero();
+                    }
+                    self.goto(original);
+                    self.out.push_str("["); //TODO yk
+                    self.goto(temp1);
+                    self.add(1);
+                    self.goto(temp2);
+                    self.add(1);
+                    self.goto(original);
+                    self.add(-1);
+                    self.out.push_str("]");
+
+                    self.vars.insert(from, temp1);
+                    self.vars.insert(to, temp2);
                 }
                 Instruction::PrintString(name) => {
                     let start = self.get_var(&name)?;
