@@ -6,15 +6,15 @@ Defines all the public methods used for the program
 
 ## instructions.rs
 
-Defines how to handle each Instruction in the program when built
+Highest level - handels instructions
 
 ## actions.rs
 
-The functions that do the actual brainfuck writing and write to the program output. Like a middle man
+Lowest level - writes the actual brainfuck
 
 ## utils.rs
 
-Helper functions used to handle memory, etc
+Medium level - methods for memory management
 
 # Available instructions (right now)
 
