@@ -6,7 +6,7 @@ pub enum Instruction {
     SetVar(String, i32),
     UnsetVar(String),
     Sum(String, String),
-    AddString(String, String),
+    SetString(String, String),
 }
 
 impl Program {
@@ -32,13 +32,14 @@ impl Program {
                     self.add(value);
                     self.vars.insert(name, index);
                 }
-                Instruction::AddString(name, val) => {
-                    let start = self.allocate_arr(val.len());
+                Instruction::SetString(name, val) => {
+                    let start = self.allocate_str(val.len());
 
                     for (i, c) in val.chars().enumerate() {
                         self.goto(start + i);
                         self.add(c as i32);
                     }
+                    self.goto(start + val.len());
 
                     self.vars.insert(name, start);
                 }

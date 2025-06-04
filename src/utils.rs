@@ -16,8 +16,10 @@ impl Program {
             i += 1;
         }
     }
-    pub(crate) fn allocate_arr(&mut self, len: usize) -> usize {
+    pub(crate) fn allocate_str(&mut self, len: usize) -> usize {
         let mut start = 0;
+        // + 1 for terminator
+        let len = len + 1;
         loop {
             if (start..start + len).all(|i| !self.used_indexes.contains(&i)) {
                 (start..start + len).for_each(|i| self.used_indexes.push(i));

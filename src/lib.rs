@@ -9,7 +9,6 @@ mod actions;
 // Other useful stuff
 mod utils;
 
-#[derive()]
 pub enum Error {
     VariableNotFound(String),
 }
