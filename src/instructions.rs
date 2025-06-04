@@ -7,6 +7,7 @@ pub enum Instruction {
     UnsetVar(String),
     Sum(String, String),
     SetString(String, String),
+    PrintString(String),
 }
 
 impl Program {
@@ -60,12 +61,19 @@ impl Program {
                     let index2 = *self.vars.get(&var2).ok_or(Error::VariableNotFound(var2))?;
                     // TODO the list making should be handled in actions.rs
                     self.goto(index2);
-                    self.out.push_str("[");
+                    self.out.push('[');
                     self.goto(index1);
-                    self.out.push_str("+");
+                    self.out.push('+');
                     self.goto(index2);
-                    self.out.push_str("-");
-                    self.out.push_str("]");
+                    self.out.push('-');
+                    self.out.push(']');
+                }
+                Instruction::PrintString(name) => {
+                    let start = *self.vars.get(&name).ok_or(Error::VariableNotFound(name))?;
+                    self.goto(start);
+                    // all this hould be not here cuz its too low level
+                    // doesnt move self.index
+                    self.out.push_str(".[>.]");
                 }
             }
         }
