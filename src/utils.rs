@@ -1,4 +1,4 @@
-use crate::Program;
+use crate::{Error, Program};
 
 impl Program {
     pub(crate) fn debug_msg(&self, msg: &str) {
@@ -35,5 +35,11 @@ impl Program {
             .position(|&x| x == self.index)
             .unwrap();
         self.used_indexes.remove(i);
+    }
+    pub(crate) fn get_var(&mut self, name: &str) -> Result<usize, Error> {
+        self.vars
+            .get(name)
+            .copied()
+            .ok_or(Error::VariableNotFound(name.to_owned()))
     }
 }

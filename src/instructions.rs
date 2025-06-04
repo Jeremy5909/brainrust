@@ -21,8 +21,8 @@ impl Program {
             match instruction {
                 Instruction::SetVar(name, value) => {
                     let index;
-                    if let Some(var) = self.vars.get(&name) {
-                        index = *var;
+                    if let Ok(var) = self.get_var(&name) {
+                        index = var;
                         self.goto(index);
                         self.set_zero();
                     } else {
@@ -45,10 +45,7 @@ impl Program {
                     self.vars.insert(name, start);
                 }
                 Instruction::UnsetVar(name) => {
-                    let index = *self
-                        .vars
-                        .get(&name)
-                        .ok_or(Error::VariableNotFound(name.clone()))?;
+                    let index = self.get_var(&name)?;
                     self.debug_msg(&format!("Unsetting {name} at {index}"));
 
                     self.goto(index);
@@ -57,8 +54,8 @@ impl Program {
                     self.deallocate();
                 }
                 Instruction::Sum(var1, var2) => {
-                    let index1 = *self.vars.get(&var1).ok_or(Error::VariableNotFound(var1))?;
-                    let index2 = *self.vars.get(&var2).ok_or(Error::VariableNotFound(var2))?;
+                    let index1 = self.get_var(&var1)?;
+                    let index2 = self.get_var(&var2)?;
                     // TODO the list making should be handled in actions.rs
                     self.goto(index2);
                     self.out.push('[');
@@ -69,7 +66,7 @@ impl Program {
                     self.out.push(']');
                 }
                 Instruction::PrintString(name) => {
-                    let start = *self.vars.get(&name).ok_or(Error::VariableNotFound(name))?;
+                    let start = self.get_var(&name)?;
                     self.goto(start);
                     // all this hould be not here cuz its too low level
                     // doesnt move self.index
