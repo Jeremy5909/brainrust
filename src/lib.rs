@@ -19,11 +19,6 @@ impl Debug for Error {
         }
     }
 }
-enum Optimization {
-    Speed,
-    Size,
-    None,
-}
 pub struct Program {
     instructions: Vec<Instruction>,
     vars: HashMap<String, usize>,
@@ -31,7 +26,7 @@ pub struct Program {
     debug: bool,
     used_indexes: Vec<usize>,
     out: String,
-    optimization: Optimization,
+    optimized: bool,
 }
 
 impl Program {
@@ -43,7 +38,7 @@ impl Program {
             debug: false,
             used_indexes: Vec::new(),
             out: String::new(),
-            optimization: Optimization::None,
+            optimized: false,
         }
     }
     pub fn debug(mut self) -> Self {
@@ -54,12 +49,12 @@ impl Program {
         self.instructions.push(instruction);
         self
     }
-    pub fn optimize_speed(mut self) -> Self {
-        self.optimization = Optimization::Speed;
+    pub fn optimized(mut self) -> Self {
+        self.optimized = true;
         self
     }
-    pub fn size(mut self) -> Self {
-        self.optimization = Optimization::Size;
+    pub fn unoptimized(mut self) -> Self {
+        self.optimized = false;
         self
     }
 }
