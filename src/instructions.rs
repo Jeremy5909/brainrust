@@ -58,13 +58,7 @@ impl Program {
                     let index1 = self.get_var(&var1)?;
                     let index2 = self.get_var(&var2)?;
                     // TODO the list making should be handled in actions.rs
-                    self.goto(index2);
-                    self.out.push('[');
-                    self.goto(index1);
-                    self.out.push('+');
-                    self.goto(index2);
-                    self.out.push('-');
-                    self.out.push(']');
+                    self.add_vars(index1, index2);
                 }
                 Instruction::Copy(target, new) => {
                     let from_index = self.get_var(&target)?;
@@ -106,5 +100,16 @@ impl Program {
         self.deallocate();
 
         (out1, out2)
+    }
+    fn add_vars(&mut self, v1: usize, v2: usize) {
+        self.goto(v2);
+        self.out.push('[');
+        self.goto(v1);
+        self.out.push('+');
+        self.goto(v2);
+        self.out.push('-');
+        self.out.push(']');
+        self.goto(v2);
+        self.deallocate();
     }
 }
