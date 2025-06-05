@@ -66,27 +66,15 @@ impl Program {
                     self.out.push('-');
                     self.out.push(']');
                 }
-                Instruction::Copy(from, to) => {
-                    let original = self.get_var(&from)?;
-                    let temp1 = self.allocate();
-                    let temp2 = self.allocate();
-                    // Reset to if somethings already there
-                    if let Ok(index2) = self.get_var(&to) {
-                        self.goto(index2);
-                        self.set_zero();
-                    }
-                    self.goto(original);
-                    self.out.push_str("["); //TODO yk
-                    self.goto(temp1);
-                    self.add(1);
-                    self.goto(temp2);
-                    self.add(1);
-                    self.goto(original);
-                    self.add(-1);
-                    self.out.push_str("]");
+                Instruction::Copy(target, new) => {
+                    let from_index = self.get_var(&target)?;
 
-                    self.vars.insert(from, temp1);
-                    self.vars.insert(to, temp2);
+                    // Make sure [new] isn't a variable already
+                    self.get_var(&new).unwrap_err();
+
+                    let (index_1, index_2) = self.copy(from_index);
+                    self.vars.insert(target, index_1);
+                    self.vars.insert(new, index_2);
                 }
                 Instruction::PrintString(name) => {
                     let start = self.get_var(&name)?;
@@ -98,5 +86,25 @@ impl Program {
             }
         }
         Ok(self.out)
+    }
+    fn copy(&mut self, target: usize) -> (usize, usize) {
+        let out1 = self.allocate();
+        let out2 = self.allocate();
+        // Reset to if somethings already there
+        self.goto(target);
+        self.out.push_str("["); //TODO yk
+        self.goto(out1);
+        self.add(1);
+        self.goto(out2);
+        self.add(1);
+        self.goto(target);
+        self.add(-1);
+        self.out.push_str("]");
+
+        // target now 0 and unused
+        self.goto(target);
+        self.deallocate();
+
+        (out1, out2)
     }
 }
