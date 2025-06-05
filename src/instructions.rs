@@ -9,6 +9,7 @@ pub enum Instruction {
     SetString(String, String),
     PrintString(String),
     Copy(String, String),
+    Multiply(String, String),
 }
 
 impl Program {
@@ -52,7 +53,7 @@ impl Program {
                     self.goto(index);
                     self.set_zero();
                     self.vars.remove(&name);
-                    self.deallocate();
+                    self.deallocate(index);
                 }
                 Instruction::Sum(var1, var2) => {
                     let index1 = self.get_var(&var1)?;
@@ -69,6 +70,24 @@ impl Program {
                     let copy = self.copy(from_index);
                     self.vars.insert(new, copy);
                 }
+                Instruction::Multiply(var1, var2) => {
+                    let val1 = self.get_var(&var1)?;
+                    let val2 = self.get_var(&var2)?;
+
+                    self.out.push('[');
+
+                    let copy1 = self.copy(val2);
+                    let copy2 = self.copy(copy1);
+                    let result = self.allocate();
+                    self.add_vars(result, copy2);
+                    self.add_vars(result, copy1);
+
+                    self.goto(val1);
+                    self.add(-1);
+                    self.goto(val2);
+
+                    self.out.push(']');
+                }
                 Instruction::PrintString(name) => {
                     let start = self.get_var(&name)?;
                     self.goto(start);
@@ -80,43 +99,35 @@ impl Program {
         }
         Ok(self.out)
     }
-    fn copy(&mut self, target: usize) -> usize {
-        let out1 = self.allocate();
-        let out2 = self.allocate();
+    // TODO i want one thing for assembly like stuff (memcpy, idk) and you define where the output
+    // should go or something or maybe it just goes one place and one for C level stuff (mult,
+    // maybe this is where u define where output goes like the mem )
+    fn copy(&mut self, original: usize) -> usize {
+        let copy1 = self.allocate();
+        let copy2 = self.allocate();
         // Reset to if somethings already there
-        self.goto(target);
+        self.goto(original);
         self.out.push_str("["); //TODO yk
-        self.goto(out1);
+        self.goto(copy1);
         self.add(1);
-        self.goto(out2);
+        self.goto(copy2);
         self.add(1);
-        self.goto(target);
+        self.goto(original);
         self.add(-1);
         self.out.push_str("]");
 
-        // should be its own function (move)
-        self.goto(out2);
-        self.out.push('[');
-        self.goto(target);
-        self.add(1);
-        self.goto(out2);
-        self.out.push(']');
-        self.add(-1);
+        self.add_vars(original, copy2);
 
-        self.goto(out2);
-        self.deallocate();
-
-        out1
+        copy1
     }
     fn add_vars(&mut self, v1: usize, v2: usize) {
         self.goto(v2);
         self.out.push('[');
         self.goto(v1);
-        self.out.push('+');
+        self.add(1);
         self.goto(v2);
-        self.out.push('-');
+        self.add(-1);
         self.out.push(']');
-        self.goto(v2);
-        self.deallocate();
+        self.deallocate(v2);
     }
 }

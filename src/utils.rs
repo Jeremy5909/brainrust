@@ -28,12 +28,8 @@ impl Program {
             start += 1;
         }
     }
-    pub(crate) fn deallocate(&mut self) {
-        let i = self
-            .used_indexes
-            .iter()
-            .position(|&x| x == self.index)
-            .unwrap();
+    pub(crate) fn deallocate(&mut self, index: usize) {
+        let i = self.used_indexes.iter().position(|&x| x == index).unwrap();
         self.used_indexes.remove(i);
     }
     pub(crate) fn get_var(&mut self, name: &str) -> Result<usize, Error> {
