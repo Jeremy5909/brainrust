@@ -66,9 +66,8 @@ impl Program {
                     // Make sure [new] isn't a variable already
                     self.get_var(&new).unwrap_err();
 
-                    let (index_1, index_2) = self.copy(from_index);
-                    self.vars.insert(target, index_1);
-                    self.vars.insert(new, index_2);
+                    let copy = self.copy(from_index);
+                    self.vars.insert(new, copy);
                 }
                 Instruction::PrintString(name) => {
                     let start = self.get_var(&name)?;
@@ -81,7 +80,7 @@ impl Program {
         }
         Ok(self.out)
     }
-    fn copy(&mut self, target: usize) -> (usize, usize) {
+    fn copy(&mut self, target: usize) -> usize {
         let out1 = self.allocate();
         let out2 = self.allocate();
         // Reset to if somethings already there
@@ -95,11 +94,19 @@ impl Program {
         self.add(-1);
         self.out.push_str("]");
 
-        // target now 0 and unused
+        // should be its own function (move)
+        self.goto(out2);
+        self.out.push('[');
         self.goto(target);
+        self.add(1);
+        self.goto(out2);
+        self.out.push(']');
+        self.add(-1);
+
+        self.goto(out2);
         self.deallocate();
 
-        (out1, out2)
+        out1
     }
     fn add_vars(&mut self, v1: usize, v2: usize) {
         self.goto(v2);
